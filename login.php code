@@ -1,0 +1,35 @@
+<?php
+
+// Block direct URL access
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    header("Location: login.html");
+    exit();
+}
+
+$username = $_POST['username'] ?? '';
+$password = $_POST['password'] ?? '';
+
+$hash = hash("sha256", $password);
+$file = "users.csv";
+
+if (!file_exists($file)) {
+    die("System error");
+}
+
+$fp = fopen($file, "r");
+$loginSuccess = false;
+
+while (($row = fgetcsv($fp)) !== false) {
+    if ($row[0] === $username && $row[1] === $hash) {
+        $loginSuccess = true;
+        break;
+    }
+}
+fclose($fp);
+
+if ($loginSuccess) {
+    echo "🎉 LOGGED IN SUCCESSFULLY";
+} else {
+    echo "❌ Invalid username or password";
+}
+?>
